@@ -5,7 +5,7 @@ version: 2.1
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  say-hello:
+  coffee-master-run:
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
     docker:
@@ -16,11 +16,9 @@ jobs:
       - checkout
       - run: node --version
       - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
-      - run:
         name: update-npm
         command: 'sudo npm install -g npm@latest'
+        
       - restore_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
@@ -33,6 +31,7 @@ jobs:
       - run:
           name: Build React App
           command: npm run build
+          
       - save_cache:
           key: app-build-cache-{{ .Branch }}
           paths:
@@ -45,4 +44,4 @@ jobs:
 workflows:
   say-hello-workflow:
     jobs:
-      - say-hello
+      - coffee-master-run
