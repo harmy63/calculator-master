@@ -19,9 +19,27 @@ jobs:
           name: "Say hello"
           command: "echo Hello, World!"
       - run:
-          name: Update NPM
-          command: "sudo npm install -g npm"
-
+        name: update-npm
+        command: 'sudo npm install -g npm@latest'
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: Install Dependencies
+          command: npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: Build React App
+          command: npm run build
+      - save_cache:
+          key: app-build-cache-{{ .Branch }}
+          paths:
+            - ./build
+      - run:
+          name: Deploy to Netlify
+          command: ./node_modules/.bin/netlify deploy --site $NETLIFY_SITE_ID --auth $NETLIFY_ACCESS_TOKEN --prod --dir=build
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
